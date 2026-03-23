@@ -1,32 +1,32 @@
 import prisma from '../utils/prismaClient.js';
 
-export default class ExemploModel {
-    constructor({ id = null, nome = null, estado = true, preco = null } = {}) {
+export default class QuartoModel {
+    constructor({ id = null, nome = null, categoria = true, preco = null } = {}) {
         this.id = id;
         this.nome = nome;
-        this.estado = estado;
+        this.categoria = categoria;
         this.preco = preco;
     }
 
     async criar() {
-        return prisma.exemplo.create({
+        return prisma.quarto.create({
             data: {
                 nome: this.nome,
-                estado: this.estado,
+                categoria: this.categoria,
                 preco: this.preco,
             },
         });
     }
 
     async atualizar() {
-        return prisma.exemplo.update({
+        return prisma.quarto.update({
             where: { id: this.id },
-            data: { nome: this.nome, estado: this.estado, preco: this.preco },
+            data: { nome: this.nome, categoria: this.categoria, preco: this.preco },
         });
     }
 
     async deletar() {
-        return prisma.exemplo.delete({ where: { id: this.id } });
+        return prisma.quarto.delete({ where: { id: this.id } });
     }
 
     static async buscarTodos(filtros = {}) {
@@ -35,21 +35,21 @@ export default class ExemploModel {
         if (filtros.nome) {
             where.nome = { contains: filtros.nome, mode: 'insensitive' };
         }
-        if (filtros.estado !== undefined) {
-            where.estado = filtros.estado === 'true';
+        if (filtros.categoria !== undefined) {
+            where.categoria = filtros.categoria === 'true';
         }
         if (filtros.preco !== undefined) {
             where.preco = parseFloat(filtros.preco);
         }
 
-        return prisma.exemplo.findMany({ where });
+        return prisma.quarto.findMany({ where });
     }
 
     static async buscarPorId(id) {
-        const data = await prisma.exemplo.findUnique({ where: { id } });
+        const data = await prisma.quarto.findUnique({ where: { id } });
         if (!data) {
             return null;
         }
-        return new ExemploModel(data);
+        return new QuartoModel(data);
     }
 }
