@@ -1,0 +1,29 @@
+{
+  "name": "sistema-hotel",
+  "version": "1.0.0",
+  "description": "sistema hotel",
+  "main": "server.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "cls && nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "grupo-3",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "fast-xml-parser": "^5.5.8",
+    "html-pdf-node": "^1.0.8",
+    "multer": "^2.1.1",
+    "pg": "^8.20.0",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prisma": "^7.3.0"
+  }
+}

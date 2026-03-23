@@ -1,0 +1,43 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Hospede {
+    id         Int     @id @default(autoincrement())
+    nome       String
+    email      String?
+    telefone   String?
+    cep        String? @db.Char(9)
+    logradouro String?
+    bairro     String?
+    localidade String?
+    uf         String? @db.Char(2)
+    ativo      Boolean @default(true)
+
+    quarto Quarto[]
+
+    @@map("hospede")
+}
+
+model Quarto {
+    id         Int       @id @default(autoincrement())
+    nome       String
+    descricao  String?
+    categoria  Categoria
+    disponivel Boolean   @default(true)
+    preco      Float
+    foto       String?
+    hospede    Hospede?  @relation(fields: [hospedeId], references: [id])
+    hospedeId  Int?
+}
+
+enum Categoria {
+    SOLTEIRO
+    CASAL
+    LUXO
+    ECONOMICO
+}
