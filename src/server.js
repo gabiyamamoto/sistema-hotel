@@ -1,6 +1,10 @@
 import express from 'express';
 import 'dotenv/config';
-import exemplosRoutes from './routes/exemploRoute.js';
+import hospedeRoutes from './routes/hospedeRoute.js';
+import quartoRoutes from './routes/quartoRoute.js';
+import pdfRoutes from './routes/pdfRoute.js';
+import fotoRoutes from './routes/fotoRoute.js';
+import autenticar from './utils/apiKey.js';
 
 const app = express();
 app.use(express.json());
@@ -12,7 +16,11 @@ app.get('/', (req, res) => {
 });
 
 // Rotas
-app.use('/api', exemplosRoutes);
+app.use('/hospede', autenticar, hospedeRoutes);
+app.use('/quarto', pdfRoutes);
+app.use('/quarto', quartoRoutes);
+app.use('/quarto', fotoRoutes);
+app.use('/uploads', express.static('uploads'));
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Rota não encontrada' });
