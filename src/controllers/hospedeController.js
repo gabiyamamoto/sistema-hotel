@@ -1,4 +1,4 @@
-import ExemploModel from '../models/ExemploModel.js';
+import HospedeModel from '../models/HospedeModel.js';
 
 export const criar = async (req, res) => {
     try {
@@ -27,16 +27,16 @@ export const criar = async (req, res) => {
 
 export const buscarTodos = async (req, res) => {
     try {
-        const registros = await ExemploModel.buscarTodos(req.query);
+        const registros = await HospedeModel.buscarTodos(req.query);
 
         if (!registros || registros.length === 0) {
-            return res.status(200).json({ message: 'Nenhum registro encontrado.' });
+            return res.status(200).json({ message: 'Nenhum hóspede encontrado.' });
         }
 
         return res.json(registros);
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        return res.status(500).json({ error: 'Erro ao buscar registros.' });
+        return res.status(500).json({ error: 'Erro ao buscar hóspede.' });
     }
 };
 
@@ -48,16 +48,16 @@ export const buscarPorId = async (req, res) => {
             return res.status(400).json({ error: 'O ID enviado não é um número válido.' });
         }
 
-        const exemplo = await ExemploModel.buscarPorId(parseInt(id));
+        const hospede = await HospedeModel.buscarPorId(parseInt(id));
 
-        if (!exemplo) {
-            return res.status(404).json({ error: 'Registro não encontrado.' });
+        if (!hospede) {
+            return res.status(404).json({ error: 'Hóspede não encontrado.' });
         }
 
-        return res.json({ data: exemplo });
+        return res.json({ data: hospede });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        return res.status(500).json({ error: 'Erro ao buscar registro.' });
+        return res.status(500).json({ error: 'Erro ao buscar hóspede.' });
     }
 };
 
