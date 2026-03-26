@@ -6,37 +6,46 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, estado, preco } = req.body;
+        const { nome, email, telefone, cep } = req.body;
 
-        if (!nome){
-            return res.status(400).json({ error: 'O campo "nome" é obrigatório!' });
+        if (!nome) {
+            return res.status(400).json({ error: "Campo obrigatório não informado." });
         }
-        if (preco === undefined || preco === null) {
-            return res.status(400).json({ error: 'O campo "preco" é obrigatório!' });
+        if (!email) {
+            return res.status(400).json({ error: "Campo obrigatório não informado." });
         }
-
-        const exemplo = new ExemploModel({ nome, estado, preco: parseFloat(preco) });
-        const data = await exemplo.criar();
+        if (!telefone) {
+            return res.status(400).json({ error: "Campo obrigatório não informado." });
+        }
+        
+        const hospede = new HospedeModel({ nome, email, telefone, cep });
+        const data = await hospede.criar();
 
         return res.status(201).json({ message: 'Registro criado com sucesso!', data });
     } catch (error) {
         console.error('Erro ao criar:', error);
-        return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
+        return res.status(400).json({ error: error.message });
     }
 };
 
 export const buscarTodos = async (req, res) => {
     try {
+        const filtros = req.query;
         const registros = await HospedeModel.buscarTodos(req.query);
 
         if (!registros || registros.length === 0) {
             return res.status(200).json({ message: 'Nenhum hóspede encontrado.' });
         }
 
-        return res.json(registros);
+        return res.status(200).json({
+            total: registros.length,
+            message: 'Lista de hóspedes disponíveis',
+            filtros,
+            registros,
+        });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        return res.status(500).json({ error: 'Erro ao buscar hóspede.' });
+        return res.status(400).json({ error: error.message });
     }
 };
 
@@ -54,10 +63,10 @@ export const buscarPorId = async (req, res) => {
             return res.status(404).json({ error: 'Hóspede não encontrado.' });
         }
 
-        return res.json({ data: hospede });
+        return res.status(200).json({ data: hospede });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        return res.status(500).json({ error: 'Erro ao buscar hóspede.' });
+        return res.status(400).json({ error: error.message });
     }
 };
 
@@ -73,28 +82,27 @@ export const atualizar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const exemplo = await ExemploModel.buscarPorId(parseInt(id));
+        const hospedeExistente = await HospedeModel.buscarPorId(parseInt(id));
 
-        if (!exemplo) {
+        if (!hospedeExistente) {
             return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
         }
 
-        if (req.body.nome !== undefined) {
-            exemplo.nome = req.body.nome;
-        }
-        if (req.body.estado !== undefined) {
-            exemplo.estado = req.body.estado;
-        }
-        if (req.body.preco !== undefined) {
-            exemplo.preco = parseFloat(req.body.preco);
-        }
+        const hospede = new HospedeModel({
+            id: parseInt(id),
+            nome: req.body.nome,
+            email: req.body.email,
+            telefone: req.body.telefone,
+            cep: req.body.cep,
+            ativo: req.body.ativo
+        })
 
-        const data = await exemplo.atualizar();
+        const data = await hospede.atualizar();
 
         return res.json({ message: `O registro "${data.nome}" foi atualizado com sucesso!`, data });
     } catch (error) {
         console.error('Erro ao atualizar:', error);
-        return res.status(500).json({ error: 'Erro ao atualizar registro.' });
+        return res.status(400).json({ error: error.message });
     }
 };
 
@@ -106,17 +114,17 @@ export const deletar = async (req, res) => {
             return res.status(400).json({ error: 'ID inválido.' });
         }
 
-        const exemplo = await ExemploModel.buscarPorId(parseInt(id));
+        const hospede = await HospedeModel.buscarPorId(parseInt(id));
 
-        if (!exemplo) {
+        if (!hospede) {
             return res.status(404).json({ error: 'Registro não encontrado para deletar.' });
         }
 
-        await exemplo.deletar();
+        await hospede.deletar();
 
-        return res.json({ message: `O registro "${exemplo.nome}" foi deletado com sucesso!`, deletado: exemplo });
+        return res.status(200).json({ message: `O registro "${hospede.nome}" foi deletado com sucesso!`, deletado: hospede });
     } catch (error) {
         console.error('Erro ao deletar:', error);
-        return res.status(500).json({ error: 'Erro ao deletar registro.' });
+        return res.status(400).json({ error: error.message });
     }
 };
