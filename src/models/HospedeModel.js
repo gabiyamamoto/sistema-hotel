@@ -1,7 +1,7 @@
 import prisma from '../utils/prismaClient.js';
 
 export default class HospedeModel {
-    constructor({ id = null, nome, email = true, telefone = null, cep = null, logradouro = null, bairro = null, localidade = null, uf = null, ativo = true } = {}) {
+    constructor({ id = null, nome, email = null, telefone = null, cep = null, logradouro = null, bairro = null, localidade = null, uf = null, ativo = true } = {}) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -24,16 +24,16 @@ export default class HospedeModel {
     
     */
 
-
     async buscarEnderecoViaCep(cep) {
         try {
             const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
 
-            if (!resposta.ok) throw new Error('Serviço ViaCEP indisponível no momento.');
+            if (!resposta.ok) throw new Error("Serviço externo indisponível.");
 
             const dados = await resposta.json();
 
-            if (dados.erro) throw new Error(`CEP ${cep} não encontrado.`);
+            if (dados.erro) throw new Error("CEP não encontrado."
+            );
 
             return {
                 logradouro: dados.logradouro,
@@ -43,9 +43,10 @@ export default class HospedeModel {
             };
 
         } catch (error) {
-            if (error.message.includes('não encontrado') || error.message.includes('ViaCEP')) throw error;
+            if (error.message.includes('CEP')) throw error;
 
-            throw new Error("Serviço ViaCEP indisponível no momento.");
+            throw new Error("Serviço externo indisponível."
+            );
         }
     }
 
@@ -54,11 +55,10 @@ export default class HospedeModel {
         const nomeValidado = this.validarNome(this.nome);
         const telefoneValidado = this.validarTelefone(this.telefone);
         const emailValidado = this.validarEmail(this.email);
-        const cepValidado = this.validarCEP(this.cep);
-        const endereco = await this.buscarEnderecoViaCep(cepValidado);
+        const cepValidado = this.cep ? this.validarCEP(this.cep) : null;
+        const endereco = cepValidado ? await this.buscarEnderecoViaCep(cepValidado) : {};
 
-
-        if (this.ativo == false) throw new Error("Não permitir operações se ativo = false");
+        if (this.ativo === false) throw new Error("Operação não permitida para registro inativo.");
 
         return prisma.hospede.create({
             data: {
@@ -77,12 +77,16 @@ export default class HospedeModel {
 
     async atualizar() {
 
+        const hospedeExistente = await prisma.hospede.findUnique({ where: { id: this.id } });
+
+        if (hospedeExistente && hospedeExistente.ativo === false) throw new Error("Operação não permitida para registro inativo.");
+
         const dataUpdate = {};
 
         if (this.nome) dataUpdate.nome = this.validarNome(this.nome);
         if (this.email) dataUpdate.email = this.validarEmail(this.email);
         if (this.telefone) dataUpdate.telefone = this.validarTelefone(this.telefone);
-        if (this.cep !== null) {
+        if (this.cep) {
             const cepValidado = this.validarCEP(this.cep);
 
             if (cepValidado) {
@@ -96,8 +100,6 @@ export default class HospedeModel {
             }
         }
 
-        if (this.ativo == false) throw new Error("Não permitir operações se ativo = false");
-
         if (this.ativo !== undefined) dataUpdate.ativo = this.ativo;
 
         return prisma.hospede.update({
@@ -108,7 +110,9 @@ export default class HospedeModel {
 
     async deletar() {
 
-        if (this.ativo == false) throw new Error("Não permitir operações se ativo = false");
+        const hospedeExistente = await prisma.hospede.findUnique({ where: { id: this.id } });
+
+        if (hospedeExistente && hospedeExistente.ativo === false) throw new Error("Operação não permitida para registro inativo.");
 
         return prisma.hospede.delete({ where: { id: this.id } });
     }
