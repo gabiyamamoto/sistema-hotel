@@ -14,15 +14,32 @@ export default class HospedeModel {
         this.ativo = ativo;
     }
 
-    /* === MADU: INSERIR REGRAS DE NEGÓCIO ====
-    
-        Nome obrigatório (3 a 100 caracteres)
-        Campos obrigatórios conforme domínio
-        CEP válido
-        Integração com ViaCEP obrigatória
-        Não permitir operações se ativo = false
-    
-    */
+    validarNome(nome) {
+        if (!nome || nome.trim().length < 3 || nome.trim().length > 100)
+            throw new Error('Nome deve conter entre 3 e 100 caracteres.');
+        return nome.trim();
+    }
+
+    validarTelefone(telefone) {
+        const telefoneNumerico = telefone.replace(/\D/g, '');
+        if (telefoneNumerico.length < 10 || telefoneNumerico.length > 11)
+            throw new Error('Telefone deve conter 10 ou 11 dígitos numéricos.');
+        return telefoneNumerico;
+    }
+
+    validarEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regex.test(email)) throw new Error('Email em formato inválido.');
+        return email.toLowerCase();
+    }
+
+    validarCEP(cep) {
+        const cepNumerico = cep.replace(/\D/g, '');
+        if (!/^\d{8}$/.test(cepNumerico)) {
+            throw new Error('CEP deve conter exatamente 8 dígitos numéricos.');
+        }
+        return cepNumerico;
+    }
 
     async buscarEnderecoViaCep(cep) {
         try {
