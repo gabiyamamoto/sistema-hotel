@@ -18,7 +18,7 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'O quarto deve ter um preço.' });
         }
 
-        const exemplo = new QuartoModel({ nome, categoria, preco: parseFloat(preco) });
+        const quarto = new QuartoModel({ nome, categoria, preco: parseFloat(preco) });
         const data = await quarto.criar();
 
         return res.status(201).json({ message: 'Quarto registrado com sucesso!', data });
