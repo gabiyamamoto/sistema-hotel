@@ -6,7 +6,7 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, categoria, preco } = req.body;
+        const { nome, categoria, preco, disponivel } = req.body;
 
         if (!nome){
             return res.status(400).json({ error: 'O nome do quarto é obrigatório.' });
@@ -16,6 +16,9 @@ export const criar = async (req, res) => {
         }
         if (preco === undefined || preco === null) {
             return res.status(400).json({ error: 'O quarto deve ter um preço.' });
+        }
+        if (!disponivel) {
+            return res.status(400).json({ error: 'O quarto deve estar classificado como disponível ou não.' });
         }
 
         const quarto = new QuartoModel({ nome, categoria, preco: parseFloat(preco) });
