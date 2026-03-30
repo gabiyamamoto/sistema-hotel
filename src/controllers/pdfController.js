@@ -11,8 +11,7 @@ export const relatorioIndividual = async (req, res) => {
         }
 
         const pdfBuffer = await gerarPdfQuarto(quarto);
-        
-        // Verificação de segurança: se o buffer falhar no helper
+
         if (!pdfBuffer) {
             throw new Error('Falha ao gerar buffer do PDF');
         }
@@ -20,12 +19,12 @@ export const relatorioIndividual = async (req, res) => {
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `inline; filename="quarto_${id}.pdf"`,
-            'Content-Length': pdfBuffer.length // Boa prática para streams de download
+            'Content-Length': pdfBuffer.length
         });
 
-        return res.end(pdfBuffer, 'binary'); // .end é mais explícito para binários
+        return res.end(pdfBuffer, 'binary');
     } catch (error) {
-        console.error(`[PDF Error]: ${error.message}`); // Essencial para debug
+        console.error(`[PDF Error]: ${error.message}`);
         return res.status(500).json({ error: 'Erro interno ao gerar o PDF.' });
     }
 };
@@ -39,7 +38,7 @@ export const relatorioGeral = async (req, res) => {
         }
 
         const pdfBuffer = await gerarPdfTodos(quartos);
-        
+
         if (!pdfBuffer) {
             throw new Error('Falha ao gerar buffer do relatório');
         }
