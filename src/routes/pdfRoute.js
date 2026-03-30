@@ -3,10 +3,7 @@ import * as controller from '../controllers/pdfController.js';
 
 const router = express.Router();
 
-router.post('/', controller.criar);
-router.get('/', controller.buscarTodos);
-router.get('/:id', controller.buscarPorId);
-router.put('/:id', controller.atualizar);
-router.delete('/:id', controller.deletar);
+router.get('/pdf', controller.relatorioGeral);
+router.get('/:id/pdf', controller.relatorioIndividual);
 
 export default router;
