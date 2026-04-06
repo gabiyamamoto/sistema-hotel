@@ -18,7 +18,7 @@
     "express": "^5.2.1",
     "express-jsdoc-swagger": "^1.8.0",
     "fast-xml-parser": "^5.5.8",
-    "html-pdf-node": "^1.0.8",
+    "html-pdf-node": "^1.0.7",
     "multer": "^2.1.1",
     "pg": "^8.20.0",
     "puppeteer": "^24.40.0",
