@@ -1,24 +1,35 @@
-import multer from 'multer';
 import sharp from 'sharp';
-import path from 'path';
+import multer from 'multer';
 import fs from 'fs';
+import path from 'path';
 
-const storage = multer.memoryStorage();
+
+const UPLOADS_DIR = './uploads';
+
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+
+        cb(null, `quarto_${req.params.id}_${Date.now()}${ext}`);
+    },
+});
+
 export const upload = multer({ storage });
 
-export const processarFoto = async (buffer, nomeArquivo) => {
-    const nomeFormatado = `${Date.now()}-${nomeArquivo.replace(/\s/g, '-')}.jpg`;
-    const caminhoCompleto = path.join('uploads', nomeFormatado);
-
-    
-    if (!fs.existsSync('uploads')) {
-        fs.mkdirSync('uploads');
-    }
-
-    await sharp(buffer)
-        .resize(800)
+export async function processarFoto(filePath) {
+    const processado = await sharp(fs.readFileSync(filePath))
+        .resize({ width: 800, withoutEnlargement: true })
         .jpeg({ quality: 80 })
-        .toFile(caminhoCompleto);
+        .toBuffer();
 
-    return caminhoCompleto;
-};
+    fs.writeFileSync(filePath, processado);
+    return filePath.replace(/\\/g, '/');
+}
+
+export function removerFoto(filePath) {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+}

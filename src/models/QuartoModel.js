@@ -1,5 +1,8 @@
+// O arquivo "QuartoModel.js" foi feito inicialmente pela dev Bianca e posteriormente modificado pela dev Julia. Os filtros do arquivo estavam sob responsablidade do dev João Stopiglia, qual utilizou IA para realizar e acabou modificando o código que estava funcionando. Portanto, o não-funcionamento do código não está nas mãos das dev's que fizeram anteriormente.
+
 import prisma from '../utils/prismaClient.js';
 
+//Feito pelo dev João Stopiglia
 const CATEGORIAS_VALIDAS = ['STANDARD', 'LUXO', 'SUITE', 'PRESIDENCIAL'];
 
 export default class QuartoModel {
@@ -41,8 +44,6 @@ export default class QuartoModel {
         return precoNumerico;
     }
 
-    //---CRUD---//
-
     async criar() {
         const nomeValidado = this.validarNome(this.nome);
         const categoriaValidada = this.validarCategoria(this.categoria)
@@ -67,10 +68,10 @@ export default class QuartoModel {
         const quartoExistente = await prisma.quarto.findUnique({ where: { id: this.id }});
 
         if (!quartoExistente) throw new Error('Registro não encontrado.')
-            
+
         if (quartoExistente.disponivel === false)
             throw new Error('Não é permitido utilizar item indisponível.')
-        
+
         const dataUpdate = {};
 
         if (this.nome !== undefined) dataUpdate.nome = this.validarNome(this.nome);
@@ -96,7 +97,6 @@ export default class QuartoModel {
         return prisma.quarto.delete({where: {id: this.id} })
     };
 
-    //--- consultas ---//
 
     static async buscarTodos(filtros = {}) {
         const where = {};
@@ -111,15 +111,21 @@ export default class QuartoModel {
             where.disponivel = filtros.disponivel === 'true'
         }
 
-        return prisma.quarto.findMany({ 
+        return prisma.quarto.findMany({
             where,
-            orderBy: { id: 'asc'} 
+            orderBy: { id: 'asc'}
         });
+    }
+
+    static async buscarPorId(id) {
+        const data = await prisma.quarto.findUnique({ where: { id } });
+        if (!data) return null;
+        return new QuartoModel(data);
     }
 
     async atualizarFoto(caminhoFoto) {
         const quartoExistente = await prisma.quarto.findUnique({where: { id: this.id} });
-        
+
         if (!quartoExistente) throw new Error('Registro não encontrado.');
 
         if(quartoExistente.disponivel === false)

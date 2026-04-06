@@ -17,9 +17,9 @@ app.get('/', (req, res) => {
 
 // Rotas
 app.use('/hospede', autenticar, hospedeRoutes);
-app.use('/catalogo', pdfRoutes);
+app.use('/quarto', fotoRoutes);
+app.use('/quarto', pdfRoutes);
 app.use('/quarto', quartoRoutes);
-app.use('/catalogo', fotoRoutes);
 app.use('/uploads', express.static('uploads'));
 
 app.use((req, res) => {
