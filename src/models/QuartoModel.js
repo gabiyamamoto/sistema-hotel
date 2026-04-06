@@ -64,7 +64,7 @@ export default class QuartoModel {
         });
     }
 
-    async atualizar() {
+    async atualizar(camposParaAtualizar) {
         const quartoExistente = await prisma.quarto.findUnique({ where: { id: this.id }});
 
         if (!quartoExistente) throw new Error('Registro não encontrado.')
@@ -74,11 +74,12 @@ export default class QuartoModel {
 
         const dataUpdate = {};
 
-        if (this.nome !== undefined) dataUpdate.nome = this.validarNome(this.nome);
-        if (this.descricao !== undefined) dataUpdate.descricao = this.descricao;
-        if (this.categoria !== undefined) dataUpdate.categoria = this.validarCategoria(this.categoria);
-        if (this.preco !== undefined) dataUpdate.preco = this.validarPreco(this.preco);
-        if (this.disponivel !== undefined) dataUpdate.disponivel = this.disponivel;
+        if ('nome' in camposParaAtualizar) dataUpdate.nome = this.validarNome(this.nome);
+        if ('categoria' in camposParaAtualizar) dataUpdate.categoria = this.validarCategoria(this.categoria);
+        if ('descricao' in camposParaAtualizar) dataUpdate.descricao = this.descricao;
+        if ('preco' in camposParaAtualizar) dataUpdate.preco = this.validarPreco(this.preco);
+        if ('disponivel' in camposParaAtualizar) dataUpdate.disponivel = this.disponivel;
+        if ('foto' in camposParaAtualizar) dataUpdate.foto = this.foto;
 
         return prisma.quarto.update({
             where: {id: this.id},
@@ -122,18 +123,6 @@ export default class QuartoModel {
         if (!data) return null;
         return new QuartoModel(data);
     }
-
-    async atualizarFoto(caminhoFoto) {
-        const quartoExistente = await prisma.quarto.findUnique({where: { id: this.id} });
-
-        if (!quartoExistente) throw new Error('Registro não encontrado.');
-
-        if(quartoExistente.disponivel === false)
-            throw new Error('Não é permitido utilizar item indisponivel.')
-
-        return prisma.quarto.update({
-            where: { id: this.id },
-            data: { foto: caminhoFoto}
-        });
-    }
 }
+
+//pq na hora de adicionar uma foto ele ta puxando ngc de validar categoria...n faz sentido.
