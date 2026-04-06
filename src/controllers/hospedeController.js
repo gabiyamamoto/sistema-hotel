@@ -17,7 +17,7 @@ export const criar = async (req, res) => {
         if (!telefone) {
             return res.status(400).json({ error: "Campo obrigatório não informado." });
         }
-        
+
         const hospede = new HospedeModel({ nome, email, telefone, cep });
         const data = await hospede.criar();
 
@@ -34,7 +34,7 @@ export const buscarTodos = async (req, res) => {
         const registros = await HospedeModel.buscarTodos(req.query);
 
         if (!registros || registros.length === 0) {
-            return res.status(200).json({ message: 'Nenhum hóspede encontrado.' });
+            return res.status(400).json({ message: 'Nenhum hóspede encontrado.' });
         }
 
         return res.status(200).json({
